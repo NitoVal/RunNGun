@@ -6,6 +6,8 @@
 #include "NiagaraComponent.h"
 #include "PlayerCharacter.h"
 #include "Components/AudioComponent.h"
+#include "Components/SphereComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -43,6 +45,14 @@ ASlotMachine::ASlotMachine()
 	
 	WinAudioComponent = CreateDefaultSubobject<UAudioComponent>("WinSFX");
 	WinAudioComponent->SetupAttachment(RootComponent);
+
+	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+	SphereComponent->SetupAttachment(RootComponent);
+	SphereComponent->SetSphereRadius(300.0f);
+	
+	WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	WidgetComponent->SetupAttachment(RootComponent);
+	WidgetComponent->SetVisibility(false);
 	
 	Price = 5;
 	bIsSpinning = false;
@@ -55,6 +65,9 @@ void ASlotMachine::BeginPlay()
 	Super::BeginPlay();
 	StartAudioComponent->Stop();
 	WinAudioComponent->Stop();
+
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ASlotMachine::OnSphereOverlapBegin);
+	SphereComponent->OnComponentEndOverlap.AddDynamic(this, &ASlotMachine::OnSphereOverlapEnd);
 }
 // Called every frame
 void ASlotMachine::Tick(float DeltaTime)
@@ -154,4 +167,15 @@ void ASlotMachine::CheckResult() const
 		if (Player)
 			Player->Coins += WinAmount;
 	}
+}
+void ASlotMachine::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+		WidgetComponent->SetVisibility(true);
+}
+
+void ASlotMachine::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex)
+{
+	if (OtherActor->IsA(APlayerCharacter::StaticClass()))
+		WidgetComponent->SetVisibility(false);
 }

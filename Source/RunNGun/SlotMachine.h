@@ -8,6 +8,8 @@
 #include "SlotMachine.generated.h"
 
 
+class UWidgetComponent;
+class USphereComponent;
 class UNiagaraComponent;
 class USoundBase;
 UCLASS()
@@ -50,10 +52,16 @@ public:
 	UAudioComponent* WinAudioComponent;
 
 	UPROPERTY(EditAnywhere)
-	class UMaterial* DefaultLineMaterial;
+	UMaterial* DefaultLineMaterial;
 
 	UPROPERTY(EditAnywhere)
-	class UMaterial* WinLineMaterial;
+	UMaterial* WinLineMaterial;
+
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	USphereComponent* SphereComponent;
+	
+	UPROPERTY(VisibleAnywhere, Category="Components")
+	UWidgetComponent* WidgetComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Price")
 	int Price;
@@ -91,5 +99,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+private:
+	UFUNCTION()
+	void OnSphereOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 };

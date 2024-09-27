@@ -70,6 +70,7 @@ APlayerCharacter::APlayerCharacter()
 	DashNiagaraSystem = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DashNiagaraSystem"));
 	DashNiagaraSystem->SetupAttachment(RootComponent);
 	DashNiagaraSystem->bAutoActivate = false;
+	
 }
 
 // Called when the game starts or when spawned

@@ -117,7 +117,6 @@ public:
 	
 	void SetDashState();
 	void DeactivateDashVFX() const;
-
 protected:
 	bool bIsAiming;
 	
@@ -143,7 +142,7 @@ protected:
 	void Aim();
 	void StopAiming();
 	void Respawn() const;
-	
+
 	UFUNCTION()
 	void HandleDeath();
 	
@@ -154,6 +153,5 @@ protected:
 
 private:
 	bool bIsSprinting;
-
-
+	
 };

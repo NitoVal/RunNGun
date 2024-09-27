@@ -154,7 +154,7 @@ void ASlotMachine::CheckResult() const
 	int WinAmount = 0;
 	
 	if (ResultLeft == ResultMiddle && ResultMiddle == ResultRight)
-		WinAmount = 50;
+		WinAmount = 100;
 	else if (ResultLeft == ResultMiddle || ResultLeft == ResultRight || ResultMiddle == ResultRight)
 		WinAmount = 5;
 

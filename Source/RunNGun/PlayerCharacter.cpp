@@ -99,11 +99,14 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	InteractionCheck();
+	const float GravityDirection = GetGravityDirection().Z;
 	if (!bIsAiming && bIsSprinting && GetVelocity().Size() == 0)
 	{
 		bIsSprinting = false;
 		GetCharacterMovement()->MaxWalkSpeed /= 2;
 	}
+	DefaultCameraLocation = GravityDirection > 0 ? FVector(0,0,-100) : FVector(0,0,100);
+	AimingCameraLocation = GravityDirection > 0 ? FVector(300,-50,-55) : FVector(300,50,55);
 }
 
 // Called to bind functionality to input
@@ -171,7 +174,7 @@ void APlayerCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 void APlayerCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	const float GravityDirection = GetGravityDirection().Z;
 	if (Controller != nullptr)
 	{
 		// find out which way is forward
@@ -186,19 +189,19 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
+		AddMovementInput(RightDirection, GravityDirection > 0 ? -MovementVector.X : MovementVector.X);
 	}
 }
 
 void APlayerCharacter::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
+	const float GravityDirection = GetGravityDirection().Z;
 	if (Controller != nullptr)
 	{
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
+		AddControllerYawInput( GravityDirection > 0 ? -LookAxisVector.X : LookAxisVector.X);
+		AddControllerPitchInput( GravityDirection > 0 ? -LookAxisVector.Y : LookAxisVector.Y);
 	}
 }
 
@@ -335,6 +338,11 @@ void APlayerCharacter::StopAiming()
 		AimingCameraTimeline->Reverse();
 }
 
+void APlayerCharacter::UpdateCameraTimeline(float TimelineValue) const
+{
+	const FVector CameraLocation = FMath::Lerp(DefaultCameraLocation, AimingCameraLocation, TimelineValue);
+	CameraBoom->SocketOffset = CameraLocation;
+}
 
 void APlayerCharacter::HandleDeath()
 {
@@ -345,14 +353,11 @@ void APlayerCharacter::HandleDeath()
 	GetWorldTimerManager().SetTimer(RestartTimer, this, &APlayerCharacter::Respawn,2.f, false);
 
 }
+
 void APlayerCharacter::Respawn() const
 {
 	UGameplayStatics::OpenLevel(this, *GetWorld()->GetMapName());
 }
 
-void APlayerCharacter::UpdateCameraTimeline(float TimelineValue) const
-{
-	const FVector CameraLocation = FMath::Lerp(DefaultCameraLocation, AimingCameraLocation, TimelineValue);
-	CameraBoom->SocketOffset = CameraLocation;
-}
+
 

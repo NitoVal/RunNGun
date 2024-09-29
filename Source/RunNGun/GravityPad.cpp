@@ -3,6 +3,7 @@
 #include "PlayerCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 
 // Sets default values
@@ -25,7 +26,6 @@ void AGravityPad::BeginPlay()
 void AGravityPad::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AGravityPad::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -35,8 +35,10 @@ void AGravityPad::NotifyActorBeginOverlap(AActor* OtherActor)
 		APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(OtherActor);
 		if (PlayerCharacter)
 		{
+			//TODO: Stop the player for aiming
 			PlayerCharacter->GetCharacterMovement()->SetGravityDirection(FVector(0,0,GravityDirection));
-			//PlayerCharacter->GetFollowCamera()->AddLocalRotation(FRotator(0,0,180));
+			PlayerCharacter->GetFollowCamera()->AddLocalRotation(FRotator(0,0,180));
+			PlayerCharacter->GetCameraBoom()->SocketOffset *= FVector(0,0,-1);
 		}
 	}
 }

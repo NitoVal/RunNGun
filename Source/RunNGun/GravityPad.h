@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "GravityPad.generated.h"
 
+class APlayerCharacter;
+
 UCLASS()
 class RUNNGUN_API AGravityPad : public AActor
 {
@@ -22,9 +24,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
+	
 	UPROPERTY(EditAnywhere, Category="Gravity")
 	float GravityDirection;
 };

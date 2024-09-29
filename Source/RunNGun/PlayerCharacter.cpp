@@ -271,12 +271,18 @@ void APlayerCharacter::InteractionCheck()
 
 void APlayerCharacter::Dash()
 {
-	if (!bIsDashing)
+	if (!bIsDashing && !GetVelocity().IsZero())
 	{
+		const float DashDistance = 5000.0f; 
+		const float DashTime = 0.5f; 
+
+		FVector currentVelocity = GetVelocity();
+		FVector dashDirection = FVector(currentVelocity.X, currentVelocity.Y, 0.0f).GetSafeNormal();
+		FVector dashVelocity = dashDirection * DashDistance / DashTime;
+		
 		DashNiagaraSystem->Activate();
 		bIsDashing = true;
-		FVector newVelocity(GetVelocity().X, GetVelocity().Y, 0.f);
-		LaunchCharacter(newVelocity * 10.f, false, false);
+		LaunchCharacter(dashVelocity, false, false);
 		GetWorldTimerManager().SetTimer(DashVFXTimer, this, &APlayerCharacter::DeactivateDashVFX,.15, false);
 		GetWorldTimerManager().SetTimer(DelayDash, this, &APlayerCharacter::SetDashState,DashCooldown, false); //Start cooldown timer
 	}

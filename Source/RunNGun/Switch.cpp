@@ -27,8 +27,6 @@ void ASwitch::Tick(float DeltaTime)
 
 void ASwitch::Interact(APlayerCharacter* Player)
 {
-	IInteractionInterface::Interact(Player);
-	
 	bIsActive = !bIsActive;
 	if (bIsActive)
 	{

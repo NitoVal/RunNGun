@@ -20,5 +20,5 @@ class RUNNGUN_API IInteractionInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void Interact(APlayerCharacter* Player);
+	virtual void Interact(APlayerCharacter* Player) = 0;
 };

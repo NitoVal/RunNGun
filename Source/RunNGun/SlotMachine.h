@@ -85,8 +85,8 @@ protected:
 	bool bIsLeftSpinning;
 	bool bIsMiddleSpinning;
 	bool bIsRightSpinning;
-	
-	void Interact(APlayerCharacter* Player) override;
+
+	virtual void Interact(APlayerCharacter* Player) override;
 	void StopLeftReel();
 	void StopMiddleReel();
 	void StopRightReel();

@@ -233,11 +233,9 @@ void APlayerCharacter::InteractionCheck()
 	const FVector ViewLocation = GetPawnViewLocation();
 	const FVector ViewDirection = GetViewRotation().Vector();
 	const FVector TraceEnd = ViewLocation + ViewDirection * 250.f;
-    
-	// Check if the player is looking forward
+	
 	if (FVector::DotProduct(GetActorForwardVector(), ViewDirection) <= 0)
 	{
-		// No need to process further if not looking forward
 		CurrentInteractable = nullptr;
 		bIsTargeting = false;
 		return;
@@ -257,7 +255,6 @@ void APlayerCharacter::InteractionCheck()
 	AActor* HitActor = TraceHit.GetActor();
 	if (HitActor && HitActor->GetClass()->ImplementsInterface(UInteractionInterface::StaticClass()))
 	{
-		// If we hit a new interactable actor, update target
 		if (HitActor != CurrentInteractable.GetObject())
 		{
 			CurrentInteractable = HitActor;
@@ -266,8 +263,7 @@ void APlayerCharacter::InteractionCheck()
 		}
 		return;
 	}
-    
-	// No valid target interactable found, clear the target
+	
 	CurrentInteractable = nullptr;
 	bIsTargeting = false;
 }
@@ -277,15 +273,15 @@ void APlayerCharacter::Dash()
 	if (!bIsDashing && !GetVelocity().IsZero())
 	{
 		const float DashDistance = 5000.0f; 
-		const float DashTime = 0.5f; 
+		const float DashTime = 0.5f;
 
-		FVector currentVelocity = GetVelocity();
-		FVector dashDirection = FVector(currentVelocity.X, currentVelocity.Y, 0.0f).GetSafeNormal();
-		FVector dashVelocity = dashDirection * DashDistance / DashTime;
+		const FVector CurrentVelocity = GetVelocity();
+		const FVector DashDirection = FVector(CurrentVelocity.X, CurrentVelocity.Y, 0.0f).GetSafeNormal();
+		const FVector DashVelocity = DashDirection * DashDistance / DashTime;
 		
 		DashNiagaraSystem->Activate();
 		bIsDashing = true;
-		LaunchCharacter(dashVelocity, false, false);
+		LaunchCharacter(DashVelocity, false, false);
 		GetWorldTimerManager().SetTimer(DashVFXTimer, this, &APlayerCharacter::DeactivateDashVFX,.15, false);
 		GetWorldTimerManager().SetTimer(DelayDash, this, &APlayerCharacter::SetDashState,DashCooldown, false); //Start cooldown timer
 	}

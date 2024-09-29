@@ -16,7 +16,7 @@ public:
 	// Sets default values for this actor's properties
 	ASwitch();
 
-	void Interact(APlayerCharacter* Player) override;
+	virtual void Interact(APlayerCharacter* Player) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

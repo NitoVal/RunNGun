@@ -13,13 +13,18 @@ ALaser::ALaser()
 	LaserMesh = CreateDefaultSubobject<UStaticMeshComponent>("LaserMesh");
 	LaserMesh->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	RootComponent = LaserMesh;
+
+	Seconds = 2;
 }
 
 // Called when the game starts or when spawned
 void ALaser::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorld()->GetTimerManager().SetTimer(LaserTimer, this,&ALaser::ActivateLaser, 2,true);
+	if (bIsTimed)
+	{
+		GetWorld()->GetTimerManager().SetTimer(LaserTimer, this,&ALaser::ActivateLaser, Seconds,true);
+	}
 }
 
 // Called every frame

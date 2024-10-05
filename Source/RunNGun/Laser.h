@@ -22,7 +22,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY(VisibleAnywhere, Category="Laser | State")
 	bool bIsActive;
+
+	UPROPERTY(EditAnywhere, Category="Laser | Timer Settings")
+	bool bIsTimed;
+
+	UPROPERTY(EditAnywhere, Category="Laser | Timer Settings")
+	float Seconds;
 	
 	virtual void Tick(float DeltaTime) override;
 

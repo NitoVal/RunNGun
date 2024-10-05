@@ -16,6 +16,7 @@
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/ArrowComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "Kismet/GameplayStatics.h"
@@ -58,6 +59,9 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	Firepoint = CreateDefaultSubobject<UArrowComponent>("Firepoint");
+	Firepoint->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	
 	AimingCameraTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("AimingCameraTimeline"));
 	DefaultCameraLocation = FVector{0.f,0.f,100.f};
@@ -145,9 +149,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APlayerCharacter::Aim);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APlayerCharacter::StopAiming);
 
+		//EnhancedInputComponent->BindAction(SwitchWeaponAction, ETriggerEvent::Started, this, &APlayerCharacter::SwitchWeapon);
+		
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Completed, this, &APlayerCharacter::Dash);
 	}
-
 }
 
 void APlayerCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -166,7 +171,7 @@ void APlayerCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 	//TODO: Replace this to be when hitting any traps
 	if (OtherActor->IsA(ALaser::StaticClass()))
 	{
-		HealthComponent->TakeDamage(1);
+		HealthComponent->TakeDamage(HealthComponent->MaxHp);
 	}
 }
 
@@ -301,7 +306,7 @@ void APlayerCharacter::Fire()
 {
 	bUseControllerRotationYaw = true;
 	// WeaponComponent->FireHitscan();
-	WeaponComponent->FireProjectile();
+	WeaponComponent->FireProjectile(Firepoint);
 	if (!bIsAiming)
 	{
 		GetWorldTimerManager().SetTimer(StopFiringTimer, this, &APlayerCharacter::StopFiring,.25, false);
@@ -346,7 +351,7 @@ void APlayerCharacter::HandleDeath()
 	if (PlayerController)
 		DisableInput(PlayerController);
 	
-	GetWorldTimerManager().SetTimer(RestartTimer, this, &APlayerCharacter::Respawn,2.f, false);
+	GetWorldTimerManager().SetTimer(RestartTimer, this, &APlayerCharacter::Respawn,1.f, false);
 
 }
 

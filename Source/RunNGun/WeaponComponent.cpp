@@ -3,6 +3,8 @@
 
 #include "WeaponComponent.h"
 #include "HealthComponent.h"
+#include "Projectile.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -18,15 +20,22 @@ void UWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentAmmo = MaxAmmo;
+	
 }
 
-void UWeaponComponent::FireProjectile()
+void UWeaponComponent::FireProjectile(const UArrowComponent* Firepoint)
 {
 	if (CurrentAmmo <= 0)
 		return;
-
-	
-	CurrentAmmo--;
+	if (Firepoint && Projectile)
+	{
+		FTransform FirePointTransform = Firepoint->GetComponentTransform();
+		
+		FirePointTransform.SetScale3D(FVector(0.1f, 0.1f, 0.1f));
+		
+		GetWorld()->SpawnActor<AProjectile>(Projectile, FirePointTransform.GetLocation(),FirePointTransform.GetRotation().Rotator(), FActorSpawnParameters());
+		CurrentAmmo--;
+	}
 }
 void UWeaponComponent::FireHitscan()
 {
@@ -34,14 +43,11 @@ void UWeaponComponent::FireHitscan()
 		return;
 	
 	FHitResult HitResult;
-
-	// Perform the line trace
+	
 	if (PerformLineTrace(HitResult))
 	{
-		// Draw debug line for hit
 		DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.Location, FColor::Red, false, 1.0f, 0, 1.0f);
-
-		// Apply damage to the hit actor
+		
 		AActor* HitActor = HitResult.GetActor();
 		if (HitActor)
 		{
@@ -72,33 +78,27 @@ bool UWeaponComponent::PerformLineTrace(FHitResult& HitResult)
 
 	AActor* Owner = GetOwner();
 	if (!Owner)
-		return false;  // No valid owner
-
-	// Check if the owner is controlled by a player or an AI
+		return false;
+	
 	AController* OwnerController = Owner->GetInstigatorController();
 	if (OwnerController)
 	{
-		// For Player or AI, get the "viewpoint"
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-		// Get forward direction and calculate trace end
+		
 		Start = CameraLocation;
 		End = CameraLocation + CameraRotation.Vector() * 10000.f;
 	}
 	else
 	{
-		// For non-player AI characters (without controller viewpoint), use actor's forward direction
 		Start = Owner->GetActorLocation();
 		End = Start + Owner->GetActorForwardVector() * 10000.f;
 	}
-
-	// Collision parameters, ignore the actor itself
+	
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(Owner);
-
-	// Perform the line trace
+	
 	return GetWorld()->LineTraceSingleByChannel(HitResult,Start,End,ECC_Visibility,QueryParams);
 }
 

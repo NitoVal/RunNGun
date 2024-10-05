@@ -7,6 +7,9 @@
 #include "WeaponComponent.generated.h"
 
 
+class AProjectile;
+class UArrowComponent;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RUNNGUN_API UWeaponComponent : public UActorComponent
 {
@@ -15,7 +18,10 @@ class RUNNGUN_API UWeaponComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UWeaponComponent();
-
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<AProjectile> Projectile;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category= "Ammo")
 	int MaxAmmo;
 
@@ -23,7 +29,7 @@ public:
 	int CurrentAmmo;
 	
 	void FireHitscan();
-	void FireProjectile();
+	void FireProjectile(const UArrowComponent* Firepoint);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
